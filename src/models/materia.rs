@@ -1,3 +1,4 @@
+#[allow(unused)]
 pub struct Materia {
     pub id: i32,
     pub titulo: String,

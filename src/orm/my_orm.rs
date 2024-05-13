@@ -1,21 +1,63 @@
-// use mysql::{params, prelude::Queryable, Pool, PooledConn, TxOpts};
+use mysql::{prelude::Queryable, Pool, PooledConn};
 
-// use crate::models::aluno::{Aluno, AlunoNota};
+use crate::traits::entidades::HasId;
 
-// pub struct AlunoMySqlRepo {
-//     pool: Pool,
-// }
+pub struct MyORM {
+    pool: Pool,
+}
 
-// impl AlunoMySqlRepo {
-//     pub fn new(connection: &str) -> Self {
-//         AlunoMySqlRepo {
-//             pool: Pool::new(connection).unwrap(),
-//         }
-//     }
+impl MyORM {
+    pub fn new(connection: &str) -> Self {
+        MyORM {
+            pool: Pool::new(connection).unwrap(),
+        }
+    }
+    fn get_conn(&self) -> PooledConn {
+        self.pool.get_conn().unwrap()
+    }
 
-//     fn get_conn(&self) -> PooledConn {
-//         self.pool.get_conn().unwrap()
-//     }
+    #[allow(unused)]
+    fn table_name<T: HasId>(&self, model: &T) -> String {
+        std::any::type_name::<T>()
+            .split("::")
+            .last()
+            .unwrap()
+            .to_lowercase()
+    }
+
+    #[allow(unused)]
+    pub fn detalhe_tablea<T: HasId>(&self, model: &T) -> String {
+        let mut sql = String::from("id integer not null auto_increment,");
+
+        let nome_campos = model.campos_model();
+
+        for field in nome_campos {
+            sql.push_str(&format!("{} varchar(255),", field));
+        }
+
+        sql.push_str("primary key (id)");
+
+        sql
+    }
+
+    pub fn create_table<T: HasId>(&self, model: T) {
+        let mut conn = self.get_conn();
+
+        let table_name = self.table_name(&model);
+        let detalhe = self.detalhe_tablea(&model);
+
+        let sql = format!(
+            "CREATE TABLE IF NOT EXISTS {}s (
+                {}
+        )",
+            table_name, detalhe
+        );
+        println!("===============================");
+        println!("{}", sql);
+        println!("===============================");
+        conn.query_drop(sql).unwrap();
+    }
+}
 
 //     pub fn get_all(&self) -> Option<Vec<Aluno>> {
 //         let mut conn = self.get_conn();
