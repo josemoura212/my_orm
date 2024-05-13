@@ -1,4 +1,7 @@
-use models::aluno::Aluno;
+use crate::models::{
+    aluno::{Aluno, AlunoNota},
+    materia::Materia,
+};
 use orm::my_orm::MyORM;
 
 mod models {
@@ -26,9 +29,23 @@ fn main() {
         matricula: "123456".to_string(),
     };
 
+    let aluno_nota = AlunoNota {
+        id: 1,
+        aluno_id: aluno.id,
+        nota: 10.0,
+    };
+
+    let materia = Materia {
+        id: 1,
+        titulo: "Matemática".to_string(),
+        descricao: "Matemática para logica de programção".to_string(),
+    };
+
     let repo = MyORM::new(&connection);
 
     repo.create_table(aluno);
+    repo.create_table(aluno_nota);
+    repo.create_table(materia);
 
     println!("Tabela criada com sucesso!")
 }

@@ -1,3 +1,4 @@
+use inflector::Inflector;
 use mysql::{prelude::Queryable, Pool, PooledConn};
 
 use crate::traits::entidades::HasId;
@@ -22,7 +23,7 @@ impl MyORM {
             .split("::")
             .last()
             .unwrap()
-            .to_lowercase()
+            .to_snake_case()
     }
 
     #[allow(unused)]
@@ -31,8 +32,8 @@ impl MyORM {
 
         let nome_campos = model.campos_model();
 
-        for field in nome_campos {
-            sql.push_str(&format!("{} varchar(255),", field));
+        for (field, tipo) in nome_campos {
+            sql.push_str(&format!("{} {},", field, tipo));
         }
 
         sql.push_str("primary key (id)");

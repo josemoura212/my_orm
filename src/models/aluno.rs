@@ -21,7 +21,23 @@ impl HasId for Aluno {
         self.id
     }
 
-    fn campos_model(&self) -> Vec<String> {
-        vec!["nome".to_string(), "matricula".to_string()]
+    fn campos_model(&self) -> Vec<(String, String)> {
+        vec![
+            ("nome".to_string(), "varchar(255)".to_string()),
+            ("matricula".to_string(), "varchar(50)".to_string()),
+        ]
+    }
+}
+
+impl HasId for AlunoNota {
+    fn id(&self) -> i32 {
+        self.id
+    }
+
+    fn campos_model(&self) -> Vec<(String, String)> {
+        vec![
+            ("aluno_id".to_string(), "integer".to_string()),
+            ("nota".to_string(), "float".to_string()),
+        ]
     }
 }
